@@ -28,8 +28,7 @@ namespace PropertySolutionCustomerPortal.Application.Estate.ContractRequestCompo
 
                 if (isUpdated)
                 {
-                    string postData = JsonConvert.SerializeObject(request);
-                    return await _httpHelper.PostAsync<bool>(postData, request.DomainKey, "/api/ContractRequestExternal/WithdrawContractRequest/" );
+                    await _contractRequestRepository.WithdrawRemoteContractRequest(request.Id, request.DomainKey);
                 }
 
                 return true;

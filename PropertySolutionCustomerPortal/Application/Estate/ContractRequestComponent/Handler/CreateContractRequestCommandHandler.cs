@@ -30,8 +30,13 @@ namespace PropertySolutionCustomerPortal.Application.Estate.ContractRequestCompo
 
                 if (contractRequestId != 0)
                 {
-                    string postData = JsonConvert.SerializeObject(request);
-                    bool result = await _contractRequestRepository.AddRemoteContractRequest(postData, request.DomainKey, contractRequestId);
+                    bool emailSent = await _contractRequestRepository.SendNewApplicationEmail(contractRequestId, request.CustomerId);
+
+                    if (emailSent)
+                    {
+                        string postData = JsonConvert.SerializeObject(request);
+                        bool result = await _contractRequestRepository.AddRemoteContractRequest(postData, request.DomainKey, contractRequestId);
+                    }
                 }
 
                 return contractRequestId;

@@ -71,14 +71,17 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Auth
                 if (result.Succeeded)
                 {
                     var newUser = await _userManager.FindByNameAsync(applicationUser.UserName);
-                    var token = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
+                   /* var token = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
                     var encodedToken = HttpUtility.UrlEncode(token);
-                    string baseUrl = "http://localhost:4200/";//_configuration["WebPortal"];//
+                    string baseUrl = _configuration["WebPortal"];//"http://localhost:4200/";
                     string activationLink = $"{baseUrl}/email-confirmation/?email={newUser.Email}&token={encodedToken}";
 
-                    string emailBody = LoadEmailTemplate("EmailConfirmationTemplate.html");
-                    emailBody = emailBody.Replace("{user}", newUser.Email.Trim());
-                    emailBody = emailBody.Replace("{activationLink}", activationLink);
+                   // string emailBody = LoadEmailTemplate("EmailConfirmationTemplate.html");
+                   // emailBody = emailBody.Replace("{user}", newUser.Email.Trim());
+                   // emailBody = emailBody.Replace("{activationLink}", activationLink);
+
+                    string mailBody = $"Dear {newUser.Email.Trim()} <BR /> Thank you for your registration, please click on the'  below link to complete your registration: <br/>" +
+                        $"{activationLink}";
 
                     var emailRequest = new EmailRequest
                     {
@@ -86,10 +89,10 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Auth
                         RecieverAddresses = new List<string>(),
                         PrimaryRecieverAddress = newUser.Email,
                         Subject = "Email Verification",
-                        Body = emailBody
+                        Body = mailBody
                     };
 
-                    await _azureEmailService.SendEmail(emailRequest);
+                    await _azureEmailService.SendEmail(emailRequest);*/
                     return newUser.Id;
                 }
                 else
@@ -110,12 +113,17 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Auth
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
             var encodedToken = HttpUtility.UrlEncode(token);
-            string baseUrl = "http://localhost:4200/";//_configuration["WebPortal"]; //
+            string baseUrl = _configuration["WebPortal"]; //"http://localhost:4200/";//
             string activationLink = $"{baseUrl}/reset-password/?email={user.Email}&token={encodedToken}";
 
-            string emailBody = LoadEmailTemplate("ForgotPasswordTemplate.html");
-            emailBody = emailBody.Replace("{user}", user.Email.Trim());
-            emailBody = emailBody.Replace("{activationLink}", activationLink);
+            // string emailBody = LoadEmailTemplate("ForgotPasswordTemplate.html");
+            // emailBody = emailBody.Replace("{user}", user.Email.Trim());
+            // emailBody = emailBody.Replace("{activationLink}", activationLink);
+
+            string mailBody = $"Dear {user.Email.Trim()} <BR /> You're receiving this message because you requested for a password reset.," +
+                $" please click on the'  below link to complete your registration: <br/>" +
+                   $"{activationLink}";
+
 
             var emailRequest = new EmailRequest
             {
@@ -123,7 +131,7 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Auth
                 RecieverAddresses = new List<string>(),
                 PrimaryRecieverAddress = user.Email,
                 Subject = "Password Reset",
-                Body = emailBody
+                Body = mailBody
             };
 
             await _azureEmailService.SendEmail(emailRequest);
@@ -137,6 +145,8 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Auth
 
             if (user == null)
                 return false;
+
+            user.Password = resetPassword.Password;
 
             var resetPassResult = await _userManager.ResetPasswordAsync(user, resetPassword.Token, resetPassword.Password);
 

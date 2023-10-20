@@ -7,6 +7,7 @@ namespace PropertySolutionCustomerPortal.Application.Estate.ContractRequestCompo
     {
         public ContractRequestDto ContractRequest { get; set; }
         public string DomainKey { get; set; }
+        public int CustomerId { get; set; }
 
     }
 }

@@ -13,7 +13,7 @@ namespace PropertySolutionCustomerPortal.Domain.Entities.Estate
         public virtual Customer Customer { get; set; }
         public int CustomerId { get; set; }
         public DateTime RequestDate { get; set; }
-        public decimal ProposedPurchasePrice { get; set; }
+        public double ProposedPurchasePrice { get; set; }
         public ContractRequestStatus Status { get; set; }
 
         public string Note { get; set; }

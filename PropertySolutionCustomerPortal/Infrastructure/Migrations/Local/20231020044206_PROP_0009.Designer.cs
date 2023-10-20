@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PropertySolutionCustomerPortal.Infrastructure.DataAccess;
 
@@ -11,9 +12,11 @@ using PropertySolutionCustomerPortal.Infrastructure.DataAccess;
 namespace PropertySolutionCustomerPortal.Infrastructure.Migrations.Local
 {
     [DbContext(typeof(LocalDbContext))]
-    partial class LocalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231020044206_PROP_0009")]
+    partial class PROP_0009
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -200,6 +203,15 @@ namespace PropertySolutionCustomerPortal.Infrastructure.Migrations.Local
                     b.Property<bool>("IsWheelchairAccessible")
                         .HasColumnType("bit");
 
+                    b.Property<int>("ManagerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ManagerImage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ManagerName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
 
@@ -214,9 +226,6 @@ namespace PropertySolutionCustomerPortal.Infrastructure.Migrations.Local
 
                     b.Property<double>("Price")
                         .HasColumnType("float");
-
-                    b.Property<int>("PropertyManagerId")
-                        .HasColumnType("int");
 
                     b.Property<int>("RemoteId")
                         .HasColumnType("int");

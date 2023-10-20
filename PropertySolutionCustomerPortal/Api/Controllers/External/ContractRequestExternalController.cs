@@ -24,5 +24,11 @@ namespace PropertySolutionCustomerPortal.Api.Controllers.External
             return await _mediator.Send(new DeleteContractRequestCommand { Id = id });
         }
 
+        [HttpPost("[action]")]
+        public async Task<ContractRequest> EditContractRequest(UpdateContractRequestCommand @object)
+        {
+            return await _mediator.Send(new UpdateContractRequestCommand { ContractRequest = @object.ContractRequest });
+        }
+
     }
 }

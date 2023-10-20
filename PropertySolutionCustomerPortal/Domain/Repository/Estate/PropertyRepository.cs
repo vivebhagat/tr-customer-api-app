@@ -46,6 +46,7 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Estate
             ValidationHelper.CheckException(property.Price <= 0, "Price should be a positive value.");
             ValidationHelper.ValidateEnum(property.Type, "Type");
             ValidationHelper.ValidateEnum(property.Status, "Status");
+            ValidationHelper.CheckException(property.PropertyManagerId == 0, "Manager is required.");
             ValidationHelper.CheckException(property.Area <= 0, "Area should be a positive value.");
         }
 

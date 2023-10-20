@@ -11,7 +11,7 @@ namespace PropertySolutionCustomerPortal.Domain.Entities.Estate
         public int PropertyId { get; set; }
         public virtual Customer Customer { get; set; }
         public int CustomerId { get; set; }
-        public decimal PurchasePrice { get; set; }
+        public double PurchasePrice { get; set; }
         public ContractStatus Status { get; set; }
         public DateTime SaleDate { get; set; }
         public int? DomainKey { get; set; }

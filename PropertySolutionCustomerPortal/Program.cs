@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PropertySolutionCustomerPortal.Domain.Entities.Shared;
 using PropertySolutionCustomerPortal.Infrastructure.DataAccess;
+using Serilog;
 using System.Text;
 
 internal class Program
@@ -15,14 +16,15 @@ internal class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         var configuration = builder.Configuration;
+        builder.Host.UseSerilog((context, configuration) => configuration.ReadFrom.Configuration(context.Configuration));
 
         builder.Services.AddIdentity<BaseApplicationUser, IdentityRole>().AddEntityFrameworkStores<AuthDbContext>().AddDefaultTokenProviders();
 
-       builder.Services.AddDbContext<IAuthDbContext, AuthDbContext>(options => options.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("AuthConnection")));
-         builder.Services.AddDbContext<ILocalDbContext, LocalDbContext>(options => options.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
-
-      //  builder.Services.AddDbContext<IAuthDbContext, AuthDbContext>(options => options.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("HostAuthConnection")));
-      // builder.Services.AddDbContext<ILocalDbContext, LocalDbContext>(options => options.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("HostDefaultConnection")));
+    //  builder.Services.AddDbContext<IAuthDbContext, AuthDbContext>(options => options.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("AuthConnection")));
+      // builder.Services.AddDbContext<ILocalDbContext, LocalDbContext>(options => options.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+     
+         builder.Services.AddDbContext<IAuthDbContext, AuthDbContext>(options => options.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("HostAuthConnection")));
+         builder.Services.AddDbContext<ILocalDbContext, LocalDbContext>(options => options.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("HostDefaultConnection")));
 
         var jwtSettings = configuration.GetSection("JWT");
         var key = Encoding.UTF8.GetBytes(jwtSettings["Secret"]);
@@ -32,6 +34,13 @@ internal class Program
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
+             .AddGoogle("google", opt =>
+             {
+                 var googleAuth = configuration.GetSection("Authentication:Google");
+                 opt.ClientId = googleAuth["ClientId"];
+                 opt.ClientSecret = googleAuth["ClientSecret"];
+                 opt.SignInScheme = IdentityConstants.ExternalScheme;
+             })
             .AddJwtBearer(options =>
              {
                  options.TokenValidationParameters = new TokenValidationParameters
@@ -83,16 +92,20 @@ internal class Program
             app.UseDeveloperExceptionPage();
         }
 
-        app.UseStaticFiles();
-
-        app.UseHttpsRedirection();
+        app.UseDefaultFiles();
+        app.UseStaticFiles(new StaticFileOptions
+        {
+            FileProvider = new PhysicalFileProvider(
+                   Path.Combine(builder.Environment.ContentRootPath, "Files")),
+            RequestPath = "/Files"
+        }); app.UseHttpsRedirection();
         app.UseRouting();
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseCors("CorsPolicy");
 
         app.UseEndpoints(endpoints =>
-        {   
+        {
             endpoints.MapControllers();
             endpoints.MapSwagger();
         });
@@ -106,5 +119,7 @@ internal class Program
         });
 
         app.Run();
+        app.UseSerilogRequestLogging();
+
     }
 }

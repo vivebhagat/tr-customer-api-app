@@ -13,11 +13,13 @@ namespace PropertySolutionCustomerPortal.Domain.Helper
     {
         private readonly string BaseAddress = string.Empty;
         private readonly IConfiguration _configuration;
+        ILogger<dynamic> _logger;
 
-        public HttpHelper(IConfiguration configuration)
+        public HttpHelper(IConfiguration configuration, ILogger<dynamic> logger)
         {
             this._configuration = configuration;
-            BaseAddress =  _configuration["BusinessUserUrl"];//"https://localhost:7184"; //
+            BaseAddress =  _configuration["BusinessUserUrl"];//"https://localhost:7184"; 
+            _logger = logger;
         }
 
         public async Task<T> GetAsync<T>(string apiUrl, string domainKey)
@@ -57,6 +59,7 @@ namespace PropertySolutionCustomerPortal.Domain.Helper
                 client.DefaultRequestHeaders.Add("DomainKey", domainKey);
 
                 HttpResponseMessage response = await client.PostAsync(BaseAddress + apiUrl, contentData);
+                _logger.LogInformation("remote post mehtod error" + response.RequestMessage.ToString());
 
                 if (response.IsSuccessStatusCode)
                 {

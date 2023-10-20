@@ -60,6 +60,8 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Users
                 ValidationHelper.ValidatePasswordFormat(customer.Password);
         }
 
+
+
         public async Task<bool> ForgotPasswowrd(string email)
         {
             return await _authRepository.ForgotPassword(email);
@@ -254,7 +256,7 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Users
                     Email = customer.Email,
                     Password = customer.Password,
                     DataRoute = "Customer",
-                    BaseApplicationUserTypeId = 3 ,//2,
+                    BaseApplicationUserTypeId = 2,
 
                 };
 

@@ -10,6 +10,7 @@ namespace PropertySolutionCustomerPortal.Api.Dto.Estate
         public string Description { get; set; }
         public string Url { get; set; }
         public double Price { get; set; }
+        public int PropertyManagerId { get; set; }
         public PropertyType Type { get; set; }
         public bool IsAvailable { get; set; }
         public DateTime? ConstructionDate { get; set; }

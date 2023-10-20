@@ -21,15 +21,8 @@ namespace PropertySolutionCustomerPortal.Api.Controllers.Estate
         [HttpPost("[action]")]
         public async Task<int> AddContractRequest(CreateContractRequestCommand @object)
         {
-            return await _mediator.Send(new CreateContractRequestCommand { ContractRequest = @object.ContractRequest, DomainKey = @object.DomainKey });
+            return await _mediator.Send(new CreateContractRequestCommand { ContractRequest = @object.ContractRequest, DomainKey = @object.DomainKey, CustomerId = @object.CustomerId });
         }
-
-        [HttpPost("[action]")]
-        public async Task<ContractRequest> EditContractRequest(UpdateContractRequestCommand @object)
-        {
-            return await _mediator.Send(new UpdateContractRequestCommand { ContractRequest = @object.ContractRequest });
-        }
-
 
         [HttpPost("[action]")]
         public async Task<bool> WithdrawContractRequest(WithdrawContractRequestCommand @object)

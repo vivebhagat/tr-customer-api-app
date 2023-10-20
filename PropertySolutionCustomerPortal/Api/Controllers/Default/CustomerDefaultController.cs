@@ -6,8 +6,10 @@ using Newtonsoft.Json.Linq;
 using PropertySolutionCustomerPortal.Api.Dto.Auth;
 using PropertySolutionCustomerPortal.Application.Estate.PropertyComponent.Command;
 using PropertySolutionCustomerPortal.Application.Users.CustomerComponent.Command;
+using PropertySolutionCustomerPortal.Application.Users.CustomerComponent.Query;
 using PropertySolutionCustomerPortal.Domain.Entities.Auth;
 using PropertySolutionCustomerPortal.Domain.Entities.Shared;
+using PropertySolutionCustomerPortal.Domain.Entities.Users;
 using System;
 using System.Xml.Linq;
 
@@ -50,50 +52,10 @@ namespace PropertySolutionCustomerPortal.Api.Controllers.Default
             return await _mediator.Send(new CreateCustomerCommand { Customer = @object.Customer });
         }
 
-        [HttpPost("[action]")]
-        public async Task<IActionResult> EmailConfirmation([FromForm] string emailConfirmation)
+        [HttpGet("[action]/{id}")]
+        public async Task<Customer> GetCustomerById(int id)
         {
-            EmailConfirmationCommand @object = JsonConvert.DeserializeObject<EmailConfirmationCommand>(emailConfirmation);
-
-            if (string.IsNullOrWhiteSpace(@object.EmailConfirmation.Email) || string.IsNullOrWhiteSpace(@object.EmailConfirmation.Token))
-                return BadRequest("Invalid email confirmation request");
-
-            bool result = await _mediator.Send(new EmailConfirmationCommand { EmailConfirmation = @object.EmailConfirmation });
-
-            if (!result)
-                return BadRequest("Invalid email confirmation request");
-            return Ok();
-        }
-
-
-        [HttpGet("[action]")]
-        public async Task<IActionResult> ForgotPassword(string email)
-        {
-            if (string.IsNullOrWhiteSpace(email))
-                return BadRequest("User not found. Please enter valid email address.");
-
-            bool result = await _mediator.Send(new ForgotPasswordCommand { Email = email });
-
-            if (!result)
-                return BadRequest("User not found. Please enter valid email address.");
-
-            return Ok();
-        }
-
-
-        [HttpPost("[action]")]
-        public async Task<IActionResult> ResetPassword([FromForm] string resetPassword)
-        {
-            ResetPasswordCommand @object = JsonConvert.DeserializeObject<ResetPasswordCommand>(resetPassword);
-
-            if (string.IsNullOrWhiteSpace(@object.ResetPassword.Email) || string.IsNullOrWhiteSpace(@object.ResetPassword.Email) || string.IsNullOrWhiteSpace(@object.ResetPassword.Token))
-                return BadRequest("Invalid passowrd reset request");
-
-            bool result = await _mediator.Send(new ResetPasswordCommand { ResetPassword = @object.ResetPassword});
-
-            if (!result)
-                return BadRequest("Invalid passowrd reset request");
-            return Ok();
+            return await _mediator.Send(new GetCustomerByIdQuery { Id = id });
         }
     }
 }
