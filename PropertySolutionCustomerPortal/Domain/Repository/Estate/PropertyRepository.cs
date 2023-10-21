@@ -2,7 +2,9 @@
 using Microsoft.Extensions.Caching.Memory;
 using PropertySolutionCustomerPortal.Domain.Entities.Auth;
 using PropertySolutionCustomerPortal.Domain.Entities.Estate;
+using PropertySolutionCustomerPortal.Domain.Entities.Setup;
 using PropertySolutionCustomerPortal.Domain.Entities.Shared;
+using PropertySolutionCustomerPortal.Domain.Entities.Users;
 using PropertySolutionCustomerPortal.Domain.EntityFilter;
 using PropertySolutionCustomerPortal.Domain.EntityFilter.FilterModel;
 using PropertySolutionCustomerPortal.Domain.Helper;
@@ -19,6 +21,8 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Estate
         Task<List<Property>> GetAllProperties(PropertyFilterUIModel @object);
         Task<Property> UpdateProperty(Property property);
         Task<List<Property>> GetHomeDisplayProperties();
+        Task<List<Organization>> GetOrganizationDetails(string domainKey);
+        Task<BusinessUser> GetManagerDetails(int Id, string domainKey);
     }
 
     public class PropertyRepository : IPropertyRepository
@@ -28,15 +32,17 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Estate
         IAuthDbContext _authDb;
         private readonly string DomainKey = string.Empty;
         IPropertyFilter _propertyFilter;
+        IHttpHelper _httpHelper;
 
-        public PropertyRepository(DapperContext dapperContext, IMemoryCache cache, IAuthDbContext authDb, ILocalDbContext db, IPropertyFilter propertyFilter)
+
+        public PropertyRepository(DapperContext dapperContext, IMemoryCache cache, IAuthDbContext authDb, ILocalDbContext db, IPropertyFilter propertyFilter, IHttpHelper httpHelper)
         {
             _cache = cache;
             _authDb = authDb;
             this.db = db;
             _propertyFilter = propertyFilter;
+            _httpHelper = httpHelper;
         }
-
       
 
         public void Validate(Property property)
@@ -106,6 +112,16 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Estate
             {
                 throw new Exception("Error deleting property. " + ex.Message);
             }
+        }
+
+        public async Task<List<Organization>> GetOrganizationDetails(string domainKey)
+        {
+            return await _httpHelper.GetAsync<List<Organization>>("/api/organizationexternal/GetAllOrganizations", domainKey);
+        }
+
+        public async Task<BusinessUser> GetManagerDetails(int Id, string domainKey)
+        {
+            return await _httpHelper.GetAsync<BusinessUser>("/api/businessuserexternal/GetBusinessUserById/" + Id, domainKey);
         }
 
         public async Task<List<Property>> GetAllProperties(PropertyFilterUIModel @object)

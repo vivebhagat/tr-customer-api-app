@@ -20,7 +20,7 @@ internal class Program
 
         builder.Services.AddIdentity<BaseApplicationUser, IdentityRole>().AddEntityFrameworkStores<AuthDbContext>().AddDefaultTokenProviders();
 
-    //  builder.Services.AddDbContext<IAuthDbContext, AuthDbContext>(options => options.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("AuthConnection")));
+    //builder.Services.AddDbContext<IAuthDbContext, AuthDbContext>(options => options.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("AuthConnection")));
       // builder.Services.AddDbContext<ILocalDbContext, LocalDbContext>(options => options.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
      
          builder.Services.AddDbContext<IAuthDbContext, AuthDbContext>(options => options.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("HostAuthConnection")));

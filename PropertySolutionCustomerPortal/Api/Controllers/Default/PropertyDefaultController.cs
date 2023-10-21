@@ -4,6 +4,8 @@ using PropertySolutionCustomerPortal.Application.Estate.PropertyComponent.Comman
 using PropertySolutionCustomerPortal.Application.Estate.PropertyComponent.Query;
 using PropertySolutionCustomerPortal.Application.Estate.PropertyImageComponent.Query;
 using PropertySolutionCustomerPortal.Domain.Entities.Estate;
+using PropertySolutionCustomerPortal.Domain.Entities.Setup;
+using PropertySolutionCustomerPortal.Domain.Entities.Users;
 using PropertySolutionCustomerPortal.Domain.EntityFilter.FilterModel;
 
 namespace PropertySolutionCustomerPortal.Api.Controllers.Default
@@ -54,6 +56,18 @@ namespace PropertySolutionCustomerPortal.Api.Controllers.Default
         public IEnumerable<Tuple<int, string>> GetPropertyStatus()
         {
             return Enum.GetValues(typeof(PropertyStatus)).Cast<PropertyStatus>().Select(value => new Tuple<int, string>((int)value, Enum.GetName(typeof(PropertyStatus), value)));
+        }
+
+        [HttpPost("[action]")]
+        public async Task<List<Organization>> GetOrganizationDetails(GetOrganizationDetailsQuery @object)
+        {
+            return await _mediator.Send(new GetOrganizationDetailsQuery { DomainKey = @object.DomainKey });
+        }
+
+        [HttpPost("[action]")]
+        public async Task<BusinessUser> GetManagerDetails(GetManagerDetailsQuery @obejct)
+        {
+            return await _mediator.Send(new GetManagerDetailsQuery { Id = @obejct.Id, DomainKey = @obejct.DomainKey });
         }
     }
 }

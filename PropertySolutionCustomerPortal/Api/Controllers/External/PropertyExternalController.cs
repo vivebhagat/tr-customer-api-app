@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using PropertySolutionCustomerPortal.Application.Estate.PropertyComponent.Command;
 using PropertySolutionCustomerPortal.Application.Estate.PropertyComponent.Query;
 using PropertySolutionCustomerPortal.Domain.Entities.Estate;
+using PropertySolutionCustomerPortal.Domain.Entities.Setup;
+using PropertySolutionCustomerPortal.Domain.Entities.Users;
 using PropertySolutionCustomerPortal.Infrastructure.Attribute;
 
 namespace PropertySolutionCustomerPortal.Api.Controllers.External
@@ -35,6 +37,5 @@ namespace PropertySolutionCustomerPortal.Api.Controllers.External
         {
             return await _mediator.Send(new DeletePropertyCommand { Id = id });
         }
-
     }
 }

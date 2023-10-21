@@ -18,7 +18,7 @@ namespace PropertySolutionCustomerPortal.Domain.Helper
         public HttpHelper(IConfiguration configuration, ILogger<dynamic> logger)
         {
             this._configuration = configuration;
-            BaseAddress =  _configuration["BusinessUserUrl"];//"https://localhost:7184"; 
+            BaseAddress =   _configuration["BusinessUserUrl"];//"https://localhost:7184";//
             _logger = logger;
         }
 
