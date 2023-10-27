@@ -4,6 +4,6 @@ namespace PropertySolutionCustomerPortal.Application.Users.CustomerComponent.Com
 {
     public class DeleteCustomerCommand : IRequest<bool>
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
     }
 }

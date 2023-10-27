@@ -11,6 +11,6 @@
         public int Role { get; set; }
         public string RoleName { get; set; }
         public int Id { get; set; }
-        public string EmailConfirmed { get; set; }
+        public string IsVerified { get; set; }
     }
 }

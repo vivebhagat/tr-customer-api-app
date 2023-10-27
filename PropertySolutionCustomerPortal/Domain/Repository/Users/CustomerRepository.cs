@@ -10,13 +10,15 @@ using PropertySolutionCustomerPortal.Domain.Repository.Auth;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
+using Castle.Core.Resource;
+using PropertySolutionCustomerPortal.Domain.Entities.Estate;
 
 namespace PropertySolutionCustomerPortal.Domain.Repository.Users
 {
     public interface ICustomerRepository : IDynamicDbRepository
     {
         Task<int> CreateCustomer(Customer customer);
-        Task<bool> DeleteCustomer(int customerId);
+        Task<bool> DeleteCustomer(string customerId);
         Task<Customer> GetCustomerById(int customerId);
         Task<List<Customer>> GetAllCustomers();
         Task<Customer> UpdateCustomer(Customer customer);
@@ -38,21 +40,20 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Users
         private readonly UserManager<BaseApplicationUser> _userManager;
         IAuthDbContext authDb;
         ILocalDbContext db;
+        IHttpHelper _httpHelper;
 
-        public CustomerRepository(IAuthRepository authRepository, ILocalDbContext db, UserManager<BaseApplicationUser> userManager, IAuthDbContext authDb, IMemoryCache cache) : base(cache, authDb)
+        public CustomerRepository(IAuthRepository authRepository, ILocalDbContext db, UserManager<BaseApplicationUser> userManager, IAuthDbContext authDb, IMemoryCache cache, IHttpHelper httpHelper) : base(cache, authDb)
         {
             _authRepository = authRepository;
             this.db = db;
             _userManager = userManager;
             this.authDb = authDb;
+            _httpHelper = httpHelper;
         }
 
         public void Validate(Customer customer)
         {
             ValidationHelper.CheckIsNull(customer);
-            ValidationHelper.CheckException(string.IsNullOrWhiteSpace(customer.FirstName), "First name is required.");
-            ValidationHelper.CheckException(string.IsNullOrWhiteSpace(customer.LastName), "Last name is required.");
-            ValidationHelper.CheckException(string.IsNullOrWhiteSpace(customer.UserName), "User name is required.");
 
             ValidationHelper.ValidateEmail(customer.Email);
 
@@ -91,7 +92,7 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Users
                 string accessToken = _authRepository.GenerateJwtToken(user, "Customer");
                 var jwt = new JwtSecurityTokenHandler().ReadJwtToken(accessToken);
                 string dataroute = jwt.Claims.First(c => c.Type == "DataRoute").Value;
-                string emailConfirmed = jwt.Claims.First(c => c.Type == "EmailConfirmed").Value;
+                string isVerified = jwt.Claims.First(c => c.Type == "IsVerified").Value;
                 var expireat = jwt.ValidTo;
 
                 RefreshToken refToken = new()
@@ -117,7 +118,7 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Users
                         ExpireAt = expireat,
                         UserId = user.Id,
                         UserName = user.UserName,
-                        EmailConfirmed = emailConfirmed,
+                        IsVerified = isVerified,
                     };
                 }
 
@@ -175,7 +176,7 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Users
 
                 var jwt = new JwtSecurityTokenHandler().ReadJwtToken(existingRefreshToken.Token);
                 string dataroute = jwt.Claims.First(c => c.Type == "DataRoute").Value;
-                string emailConfirmed = jwt.Claims.First(c => c.Type == "EmailConfirmed").Value;
+                string isVerified = jwt.Claims.First(c => c.Type == "IsVerified").Value;
                 DateTime expireat = jwt.ValidTo;
                 string userId = jwt.Claims.First(c => c.Type == "sub").Value;
                 string userName = jwt.Claims.First(c => c.Type == ClaimTypes.Name).Value;
@@ -219,7 +220,7 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Users
                         Role = customerToRoleMap.RoleId,
                         RoleName = customerToRoleMap.Role.Name,
                         Id = customerToRoleMap.CustomerId,
-                        EmailConfirmed = emailConfirmed
+                        IsVerified = isVerified,
                     };
                 }
 
@@ -252,7 +253,7 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Users
 
                 BaseApplicationUser applicationUser = new()
                 {
-                    UserName = customer.UserName,
+                    UserName = customer.Email,
                     Email = customer.Email,
                     Password = customer.Password,
                     DataRoute = "Customer",
@@ -261,7 +262,7 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Users
                 };
 
                 string result = await _authRepository.RegisterUser(applicationUser);
-
+                customer.UserName = customer.Email;
                 customer.UserId = result.ToString();
                 customer.CreatedDate = DateTime.Now;
 
@@ -291,9 +292,18 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Users
             {
                 Validate(customer);
 
+                var existingCustomer = db.Customers.AsNoTracking().Where(m => m.UserId == customer.UserId && m.ArchiveDate == null).FirstOrDefault();
+
+                if (existingCustomer == null)
+                    throw new Exception("Customer not found.");
+
+                if (existingCustomer.Email != customer.Email)
+                {
+                    throw new Exception("Email cannot be changed.");
+                }
+
                 BaseApplicationUser commonApplicationUser = new BaseApplicationUser
                 {
-                    UserName = customer.UserName,
                     Email = customer.Email,
                     Password = customer.Password,
                 };
@@ -311,14 +321,16 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Users
             }
         }
 
-        public async Task<bool> DeleteCustomer(int customerId)
+        public async Task<bool> DeleteCustomer(string Id)
         {
             try
             {
-                Customer customer = db.Customers.Where(m => m.Id == customerId && m.ArchiveDate == null).FirstOrDefault() ?? throw new Exception("Customer details not found.");
-                customer.ModifiedDate = DateTime.Now;
-                customer.ArchiveDate = DateTime.Now;
-                await db.SaveChangesAsync();
+                Customer customer = db.Customers.Where(m => m.UserId == Id && m.ArchiveDate == null).FirstOrDefault() ?? throw new Exception("Customer details not found.");
+
+                if (await _authRepository.DeletUser(customer.UserId)) {
+                    db.Remove(customer);
+                    db.SaveChanges();
+                }
                 return true;
             }
             catch (Exception ex)

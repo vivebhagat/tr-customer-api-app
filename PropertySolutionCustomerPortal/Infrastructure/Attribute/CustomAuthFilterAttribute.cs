@@ -31,10 +31,10 @@ namespace RechordWebApp.Attribute
                 var token = context.HttpContext.Request.Headers["Authorization"].ToString().Substring("Bearer ".Length);
                 var jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
                 string role = jwt.Claims.First(c => c.Type == "authRole").Value;
-                //string emailConfirmed = jwt.Claims.First(c => c.Type == "EmailConfirmed").Value;
+                string isVerified = jwt.Claims.First(c => c.Type == "IsVerified").Value;
                 var validTill = jwt.ValidTo;
 
-                if(validTill < DateTime.UtcNow || string.IsNullOrEmpty(role))
+                if(validTill < DateTime.UtcNow || string.IsNullOrEmpty(role) || string.IsNullOrEmpty(isVerified) || isVerified != "true")
                 {
                     context.Result = new UnauthorizedResult();
                     return;

@@ -41,7 +41,7 @@ namespace PropertySolutionCustomerPortal.Api.Controllers.User
         }
 
         [HttpGet("[action]/{id}")]
-        public async Task<bool> DeleteCustomer(int id)
+        public async Task<bool> DeleteCustomer(string id)
         {
             return await _mediator.Send(new DeleteCustomerCommand { Id = id });
         }

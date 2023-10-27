@@ -1,4 +1,5 @@
 ﻿using Azure.Core;
+using Castle.Core.Resource;
 using Castle.Core.Smtp;
 using Dapper;
 using Microsoft.AspNetCore.Hosting.Server;
@@ -8,7 +9,9 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
 using PropertySolutionCustomerPortal.Api.Dto.Auth;
 using PropertySolutionCustomerPortal.Domain.Entities.Auth;
+using PropertySolutionCustomerPortal.Domain.Entities.Estate;
 using PropertySolutionCustomerPortal.Domain.Entities.Shared;
+using PropertySolutionCustomerPortal.Domain.Entities.Users;
 using PropertySolutionCustomerPortal.Domain.Service.Email;
 using PropertySolutionCustomerPortal.Infrastructure.DataAccess;
 using System;
@@ -28,9 +31,11 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Auth
         string GenerateJwtToken(BaseApplicationUser user, string authRole);
         Task<bool> AddRefreshToken(RefreshToken refreshToken);
         Task<bool> RemoveRefreshToken(string userId);
+        Task<bool> DeletUser(string userId);
         Task<bool> EmailConfirmation(EmailConfirmation @object);
         Task<bool> ResetPassword(ResetPassword resetPassword);
         Task<bool> ForgotPassword(string email);
+        Task<bool> SendConfirmationEmail(BaseApplicationUser user);
     }
 
     public class AuthRepository : IAuthRepository
@@ -52,9 +57,16 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Auth
 
         private string LoadEmailTemplate(string templateFileName)
         {
-            string templatePath = Path.Combine(_environment.ContentRootPath, "Files", templateFileName);
-            using StreamReader reader = new StreamReader(templatePath);
-            return reader.ReadToEnd();
+            try
+            {
+                string templatePath = Path.Combine(_environment.ContentRootPath, "Files", templateFileName);
+                using StreamReader reader = new StreamReader(templatePath);
+                return reader.ReadToEnd();
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
         }
 
         public async Task<string> RegisterUser(BaseApplicationUser applicationUser)
@@ -71,28 +83,8 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Auth
                 if (result.Succeeded)
                 {
                     var newUser = await _userManager.FindByNameAsync(applicationUser.UserName);
-                   /* var token = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
-                    var encodedToken = HttpUtility.UrlEncode(token);
-                    string baseUrl = _configuration["WebPortal"];//"http://localhost:4200/";
-                    string activationLink = $"{baseUrl}/email-confirmation/?email={newUser.Email}&token={encodedToken}";
-
-                   // string emailBody = LoadEmailTemplate("EmailConfirmationTemplate.html");
-                   // emailBody = emailBody.Replace("{user}", newUser.Email.Trim());
-                   // emailBody = emailBody.Replace("{activationLink}", activationLink);
-
-                    string mailBody = $"Dear {newUser.Email.Trim()} <BR /> Thank you for your registration, please click on the'  below link to complete your registration: <br/>" +
-                        $"{activationLink}";
-
-                    var emailRequest = new EmailRequest
-                    {
-                        Source = "rajeshirkesairaj@gmail.com",
-                        RecieverAddresses = new List<string>(),
-                        PrimaryRecieverAddress = newUser.Email,
-                        Subject = "Email Verification",
-                        Body = mailBody
-                    };
-
-                    await _azureEmailService.SendEmail(emailRequest);*/
+                    //send verify email
+                    await SendConfirmationEmail(newUser);
                     return newUser.Id;
                 }
                 else
@@ -101,6 +93,86 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Auth
             catch (Exception e)
             {
                 throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<bool> SendConfirmationEmail(BaseApplicationUser user)
+        {
+            try
+            {
+                var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                var encodedToken = HttpUtility.UrlEncode(token);
+                string baseUrl = _configuration["WebPortal"];//"http://localhost:4200/";//
+                string activationLink = $"{baseUrl}/email-confirmation/?email={user.Email}&token={encodedToken}";
+
+                string emailBody = LoadEmailTemplate("EmailConfirmationTemplate.html");
+
+                if (string.IsNullOrEmpty(emailBody))
+                    return false;
+
+                emailBody = ReplaceConfimationEmailTokens(emailBody, user.Email, activationLink);
+
+                if (string.IsNullOrEmpty(emailBody))
+                    return false;
+
+                if (!await Send(user.Email, "Verify Email", emailBody))
+                    return false;
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+
+        private async Task<bool> Send(string email, string subject, string emailBody)
+        {
+            try
+            {
+                var emailRequest = new EmailRequest
+                {
+                    RecieverAddresses = new List<string>(),
+                    PrimaryRecieverAddress = email,
+                    Subject = subject,
+                    Body = emailBody
+                };
+
+                await _azureEmailService.SendEmail(emailRequest);
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+
+        private string ReplaceConfimationEmailTokens(string emailBody, string user, string activationLink)
+        {
+            try
+            {
+                emailBody = emailBody.Replace("{User}", user.Trim());
+                emailBody = emailBody.Replace("{activationLink}", activationLink);
+                return emailBody;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        }
+
+        private string ReplaceForgotpasswordTokens(string emailBody, string user, string activationLink)
+        {
+            try
+            {
+                emailBody = emailBody.Replace("{User}", user.Trim());
+                emailBody = emailBody.Replace("{activationLink}", activationLink);
+                return emailBody;
+            }
+            catch (Exception e)
+            {
+                return null;
             }
         }
 
@@ -113,28 +185,21 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Auth
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
             var encodedToken = HttpUtility.UrlEncode(token);
-            string baseUrl = _configuration["WebPortal"]; //"http://localhost:4200/";//
+            string baseUrl =  _configuration["WebPortal"]; //"http://localhost:4200/";//
             string activationLink = $"{baseUrl}/reset-password/?email={user.Email}&token={encodedToken}";
 
-            // string emailBody = LoadEmailTemplate("ForgotPasswordTemplate.html");
-            // emailBody = emailBody.Replace("{user}", user.Email.Trim());
-            // emailBody = emailBody.Replace("{activationLink}", activationLink);
+            string emailBody = LoadEmailTemplate("ForgotPasswordTemplate.html");
 
-            string mailBody = $"Dear {user.Email.Trim()} <BR /> You're receiving this message because you requested for a password reset.," +
-                $" please click on the'  below link to complete your registration: <br/>" +
-                   $"{activationLink}";
+            if (string.IsNullOrEmpty(emailBody))
+                return false;
 
+            emailBody = ReplaceForgotpasswordTokens(emailBody, user.Email, activationLink);
 
-            var emailRequest = new EmailRequest
-            {
-                Source = "rajeshirkesairaj@gmail.com",
-                RecieverAddresses = new List<string>(),
-                PrimaryRecieverAddress = user.Email,
-                Subject = "Password Reset",
-                Body = mailBody
-            };
+            if (string.IsNullOrEmpty(emailBody))
+                return false;
 
-            await _azureEmailService.SendEmail(emailRequest);
+            if (!await Send(user.Email, "Reset Password", emailBody))
+                return false;
 
             return true;
         }
@@ -159,7 +224,11 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Auth
         public async Task<bool> EmailConfirmation(EmailConfirmation @object)
         {
             var user = await _userManager.FindByEmailAsync(@object.Email);
+
             if (user == null)
+                return false;
+
+            if (await _userManager.IsEmailConfirmedAsync(user))
                 return false;
 
             var confirmResult = await _userManager.ConfirmEmailAsync(user, @object.Token);
@@ -176,7 +245,7 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Auth
             {
                 var user = await _userManager.FindByIdAsync(userId);
 
-                user.UserName = applicationUser.UserName;
+                user.UserName = applicationUser.Email;
                 user.Email = applicationUser.Email;
 
                 if (user == null)
@@ -232,6 +301,16 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Auth
             return await _authDb.SaveChangesAsync() > 0;
         }
 
+        public async Task<bool> DeletUser(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return false;
+
+            var result = await _userManager.DeleteAsync(user);
+
+            return result.Succeeded;
+        }
 
         public async Task<BaseApplicationUser> ValidateUser(string userName, string password)
         {
@@ -259,7 +338,7 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Auth
                 {
                     new Claim(JwtRegisteredClaimNames.Sub, user.Id),
                     new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim("EmailConfirmed", user.EmailConfirmed.ToString()),
+                    new Claim("IsVerified", user.EmailConfirmed.ToString(), ClaimValueTypes.Boolean),
                     new Claim("DataRoute", user.DataRoute)
                 };
 
