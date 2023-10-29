@@ -36,6 +36,7 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Auth
         Task<bool> ResetPassword(ResetPassword resetPassword);
         Task<bool> ForgotPassword(string email);
         Task<bool> SendConfirmationEmail(BaseApplicationUser user);
+        Task<BaseApplicationUser> GetUserByUserId(string userId);
     }
 
     public class AuthRepository : IAuthRepository
@@ -310,6 +311,16 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Auth
             var result = await _userManager.DeleteAsync(user);
 
             return result.Succeeded;
+        }
+
+        public async Task<BaseApplicationUser> GetUserByUserId(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+                return null;
+
+            return user;
         }
 
         public async Task<BaseApplicationUser> ValidateUser(string userName, string password)

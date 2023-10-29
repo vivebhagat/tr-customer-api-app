@@ -40,7 +40,7 @@ namespace PropertySolutionCustomerPortal.Api.Controllers.User
             return await _mediator.Send(new UpdateCustomerCommand { Customer = @objec.Customer });
         }
 
-        [HttpGet("[action]/{id}")]
+        [HttpGet("[action]/{id}"),Authorize]
         public async Task<bool> DeleteCustomer(string id)
         {
             return await _mediator.Send(new DeleteCustomerCommand { Id = id });
@@ -58,7 +58,7 @@ namespace PropertySolutionCustomerPortal.Api.Controllers.User
             return await _mediator.Send(new GetCustomerByIdQuery { Id = id });
         }
 
-        [HttpGet("[action]/{id}")]
+        [HttpGet("[action]/{id}"), Authorize]
         public async Task<Customer> GetCustomerByUserId(string id)
         {
             return await _mediator.Send(new GetCustomerByUserIdQuery { UserId = id });

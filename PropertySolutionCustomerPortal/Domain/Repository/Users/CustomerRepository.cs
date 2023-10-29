@@ -30,6 +30,7 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Users
         Task<bool> EmailConfirmation(EmailConfirmation emailConfirmation);
         Task<bool> ResetPassword(ResetPassword resetPassword);
         Task<bool> ForgotPasswowrd(string email);
+        Task<bool> SendEmailConfirmationMail(string userId);
 
     }
 
@@ -62,12 +63,20 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Users
         }
 
 
+        public async Task<bool> SendEmailConfirmationMail(string userId)
+        {
+            var user =  await _authRepository.GetUserByUserId(userId);
+
+            if (user == null)
+                return false;
+
+            return await _authRepository.SendConfirmationEmail(user);
+        }
 
         public async Task<bool> ForgotPasswowrd(string email)
         {
             return await _authRepository.ForgotPassword(email);
         }
-
 
         public async Task<bool> EmailConfirmation(EmailConfirmation emailConfirmation)
         {
