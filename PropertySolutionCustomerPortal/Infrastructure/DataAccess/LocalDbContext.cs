@@ -31,6 +31,9 @@ namespace PropertySolutionCustomerPortal.Infrastructure.DataAccess
         public DbSet<CustomerToRoleMap> CustomerToRoleMaps { get; set; }
         public DbSet<CustomerRole> CustomerRole { get; set; }
 
+        public DbSet<Community> Communities { get; set; }
+
+
 
         public DbSet<TEntity> Set<TEntity>() where TEntity : class
         {

@@ -14,7 +14,7 @@ namespace PropertySolutionCustomerPortal.Domain.Entities.Estate
         public string Url { get; set; }
         public double Price { get; set; }
         public int PropertyManagerId { get; set; }
-        public PropertyType Type { get; set; }
+        public string UnitType { get; set; }
         public bool IsAvailable { get; set; }
         public DateTime? ConstructionDate { get; set; }
         public PropertyStatus Status { get; set; }
@@ -26,6 +26,7 @@ namespace PropertySolutionCustomerPortal.Domain.Entities.Estate
         public int Bathrooms { get; set; }
         public double Area { get; set; }
         public bool IsFurnished { get; set; }
+        public bool IsPublished { get; set; }
         public bool AirConditioning { get; set; }
         public bool IsGarage { get; set; }
         public bool Heating { get; set; }

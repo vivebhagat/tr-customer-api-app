@@ -5,7 +5,7 @@ namespace PropertySolutionCustomerPortal.Domain.EntityFilter.FilterModel
     public class PropertyFilterUIModel
     {
         public string? Name { get; set; }
-        public PropertyType? Type { get; set; }
+        public string? UnitType { get; set; }
         public int? Bedrooms { get; set; }
         public double? MinPrice { get; set; }
         public double? MaxPrice { get; set; }

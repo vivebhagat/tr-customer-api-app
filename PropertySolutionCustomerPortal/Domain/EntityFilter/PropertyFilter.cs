@@ -16,8 +16,8 @@ namespace PropertySolutionCustomerPortal.Domain.EntityFilter
             if (!string.IsNullOrWhiteSpace(filterUIModel.Name))
                 properties = properties.Where(p => p.Address.Contains(filterUIModel.Name));
 
-            if (filterUIModel.Type.HasValue)
-                properties = properties.Where(p => p.Type == filterUIModel.Type.Value);
+            if (!string.IsNullOrWhiteSpace(filterUIModel.UnitType))
+                properties = properties.Where(p => p.Address.Contains(filterUIModel.UnitType));
 
             if (filterUIModel.Bedrooms.HasValue)
             {

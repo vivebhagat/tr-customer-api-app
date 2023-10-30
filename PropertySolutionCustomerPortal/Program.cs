@@ -29,11 +29,11 @@ internal class Program
         builder.Services.Configure<EmailConfirmationTokenProviderOptions>(opt =>
             opt.TokenLifespan = TimeSpan.FromDays(1));
 
-    //    builder.Services.AddDbContext<IAuthDbContext, AuthDbContext>(options => options.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("AuthConnection")));
-    // builder.Services.AddDbContext<ILocalDbContext, LocalDbContext>(options => options.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+      builder.Services.AddDbContext<IAuthDbContext, AuthDbContext>(options => options.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("AuthConnection")));
+     builder.Services.AddDbContext<ILocalDbContext, LocalDbContext>(options => options.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
      
-      builder.Services.AddDbContext<IAuthDbContext, AuthDbContext>(options => options.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("HostAuthConnection")));
-      builder.Services.AddDbContext<ILocalDbContext, LocalDbContext>(options => options.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("HostDefaultConnection")));
+     // builder.Services.AddDbContext<IAuthDbContext, AuthDbContext>(options => options.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("HostAuthConnection")));
+     // builder.Services.AddDbContext<ILocalDbContext, LocalDbContext>(options => options.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("HostDefaultConnection")));
 
         var jwtSettings = configuration.GetSection("JWT");
         var key = Encoding.UTF8.GetBytes(jwtSettings["Secret"]);

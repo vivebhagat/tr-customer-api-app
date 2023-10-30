@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PropertySolutionCustomerPortal.Infrastructure.DataAccess;
 
@@ -11,9 +12,11 @@ using PropertySolutionCustomerPortal.Infrastructure.DataAccess;
 namespace PropertySolutionCustomerPortal.Infrastructure.Migrations.Local
 {
     [DbContext(typeof(LocalDbContext))]
-    partial class LocalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231030060537_PROP_0011")]
+    partial class PROP_0011
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -294,9 +297,6 @@ namespace PropertySolutionCustomerPortal.Infrastructure.Migrations.Local
                     b.Property<bool>("IsGarage")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsPublished")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsSmokingAllowed")
                         .HasColumnType("bit");
 
@@ -330,8 +330,8 @@ namespace PropertySolutionCustomerPortal.Infrastructure.Migrations.Local
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<string>("UnitType")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.Property<string>("Url")
                         .HasColumnType("nvarchar(max)");

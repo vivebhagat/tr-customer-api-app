@@ -21,6 +21,9 @@ namespace PropertySolutionCustomerPortal.Infrastructure.DataAccess
         DbSet<CustomerToRoleMap> CustomerToRoleMaps { get; set; }
         DbSet<CustomerRole> CustomerRole { get; set; }
 
+        DbSet<Community> Communities { get; set; }
+
+
         DbSet<TEntity> Set<TEntity>() where TEntity : class;
         int SaveChanges();
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

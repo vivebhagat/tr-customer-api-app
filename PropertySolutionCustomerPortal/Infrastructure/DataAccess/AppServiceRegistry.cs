@@ -30,6 +30,9 @@ namespace PropertySolutionCustomerPortal.Infrastructure.DataAccess
 
             services.AddScoped<IContractRepository, ContractRepository>();
             services.AddScoped<IContractRequestRepository, ContractRequestRepository>();
+
+            services.AddScoped<ICommunityRepository, CommunityRepository>();
+
         }
     }
 }

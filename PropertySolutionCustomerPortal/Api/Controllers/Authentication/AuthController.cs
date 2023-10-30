@@ -27,6 +27,20 @@ namespace PropertySolutionCustomerPortal.Api.Controllers.Authentication
             return Ok();
         }
 
+        [HttpGet("[action]")]
+        public async Task<IActionResult> SendVerificationEmail(string userId)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+                return BadRequest("Invalid email verification request");
+
+            bool result = await _mediator.Send(new SendVerificationEmailCommand { UserId = userId });
+
+            if (!result)
+                return BadRequest("Invalid email verification request");
+            return Ok(result);
+        }
+
+
 
         [HttpPost("[action]")]
         public async Task<IActionResult> EmailConfirmation([FromForm] string emailConfirmation)
@@ -40,7 +54,7 @@ namespace PropertySolutionCustomerPortal.Api.Controllers.Authentication
 
             if (!result)
                 return BadRequest("Invalid email confirmation request");
-            return Ok();
+            return Ok(result);
         }
 
 
@@ -55,7 +69,7 @@ namespace PropertySolutionCustomerPortal.Api.Controllers.Authentication
             if (!result)
                 return BadRequest("User not found. Please enter valid email address.");
 
-            return Ok();
+            return Ok(result);
         }
 
 
@@ -71,7 +85,7 @@ namespace PropertySolutionCustomerPortal.Api.Controllers.Authentication
 
             if (!result)
                 return BadRequest("Invalid passowrd reset request");
-            return Ok();
+            return Ok(result);
         }
     }
 }

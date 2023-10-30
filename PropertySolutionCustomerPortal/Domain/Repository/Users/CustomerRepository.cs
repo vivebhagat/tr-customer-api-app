@@ -266,7 +266,7 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Users
                     Email = customer.Email,
                     Password = customer.Password,
                     DataRoute = "Customer",
-                    BaseApplicationUserTypeId = 2,
+                    BaseApplicationUserTypeId = 3,
 
                 };
 
