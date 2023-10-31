@@ -6,7 +6,6 @@ namespace PropertySolutionCustomerPortal.Application.Estate.PropertyComponent.Co
 {
     public class UpdateCommunityCommand : IRequest<Community>
     {
-        public Community Community { get; set; }
-
+        public CommunityDto Community { get; set; }
     }
 }

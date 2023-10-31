@@ -48,7 +48,7 @@ namespace PropertySolutionCustomerPortal.Domain.EntityFilter
             if (filterUIModel.MaxArea.HasValue)
                 properties = properties.Where(p => p.Area <= filterUIModel.MaxArea.Value);
 
-            properties = properties.Where(m => m.ArchiveDate == null);
+            properties = properties.Where(m => m.IsPublished && m.ArchiveDate == null);
             properties = properties.OrderByDescending(m => m.Id);
 
             return properties;

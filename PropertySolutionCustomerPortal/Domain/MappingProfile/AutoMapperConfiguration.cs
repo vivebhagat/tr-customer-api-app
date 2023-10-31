@@ -13,6 +13,7 @@ namespace PropertySolutionCustomerPortal.Domain.MappingProfile
                 cfg.AddProfile<PropertyMappingProfile>();
                 cfg.AddProfile<ContractRequestMappingProfile>();
                 cfg.AddProfile<CustomerMappingProfile>();
+                cfg.AddProfile<CommunityMappingProfile>();
             });
             return config;
         }

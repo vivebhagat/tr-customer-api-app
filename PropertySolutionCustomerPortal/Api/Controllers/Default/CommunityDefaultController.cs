@@ -19,7 +19,7 @@ namespace PropertySolutionCustomerPortal.Api.Controllers.Default
             _mediator = mediator;
         }
 
-        [HttpPost("GetAll")]
+        [HttpGet("GetAll")]
         public async Task<List<Community>> GetAllCommunity()
         {
             return await _mediator.Send(new GetAllCommunityQuery());

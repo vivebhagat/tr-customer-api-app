@@ -6,18 +6,18 @@ namespace PropertySolutionCustomerPortal.Api.Dto.Estate
     {
         public int Id { get; set; }
         public int RemoteId { get; set; }
+        public string Url { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public string Url { get; set; }
         public double Price { get; set; }
         public int PropertyManagerId { get; set; }
-        public PropertyType Type { get; set; }
+        public string UnitType { get; set; }
         public bool IsAvailable { get; set; }
+        public bool IsPublished { get; set; }
         public DateTime? ConstructionDate { get; set; }
         public PropertyStatus Status { get; set; }
         public string Address { get; set; }
-        public string City { get; set; }
-        public string State { get; set; }
+        public bool IsFeatured { get; set; }
         public string ZipCode { get; set; }
 
         public int Bedrooms { get; set; }

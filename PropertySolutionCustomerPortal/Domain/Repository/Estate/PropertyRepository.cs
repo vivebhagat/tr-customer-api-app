@@ -58,7 +58,6 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Estate
 
         public async Task<int> CreateProperty(Property property)
         {
-
             try
             {
                 var context = new HttpContextAccessor();
@@ -134,7 +133,7 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Estate
 
         public async Task<List<Property>> GetHomeDisplayProperties()
         {
-            return await db.Property.Where(m => m.ArchiveDate == null).OrderByDescending(m => m.CreatedDate).Take(6).ToListAsync();
+            return await db.Property.Where(m => m.IsPublished && m.ArchiveDate == null).OrderByDescending(m => m.CreatedDate).Take(6).ToListAsync();
         }
 
         public async Task<Property> GetPropertyById(int Id)

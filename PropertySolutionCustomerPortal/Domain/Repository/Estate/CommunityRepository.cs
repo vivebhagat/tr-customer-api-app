@@ -100,12 +100,12 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Estate
 
         public async Task<List<Community>> GetAllCommunities()
         {
-            return await db.Communities.Where(m => m.ArchiveDate == null).ToListAsync();
+            return await db.Communities.Where(m => m.IsPublished && m.ArchiveDate == null).ToListAsync();
         }
 
         public async Task<List<Community>> GetHomeDisplayCommunitites()
         {
-            return await db.Communities.Where(m => m.ArchiveDate == null).OrderByDescending(m => m.Id).Take(6).ToListAsync();
+            return await db.Communities.Where(m => m.IsPublished && m.ArchiveDate == null).OrderByDescending(m => m.Id).Take(6).ToListAsync();
         }
 
         public async Task<Community> GetCommunityById(int Id)
