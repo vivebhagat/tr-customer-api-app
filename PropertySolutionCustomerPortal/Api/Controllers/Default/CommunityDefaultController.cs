@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using PropertySolutionCustomerPortal.Application.Estate.CommunityComponent.Query;
 using PropertySolutionCustomerPortal.Application.Estate.PropertyComponent.Query;
 using PropertySolutionCustomerPortal.Domain.Entities.Estate;
 using PropertySolutionCustomerPortal.Domain.Entities.Setup;
@@ -35,6 +36,12 @@ namespace PropertySolutionCustomerPortal.Api.Controllers.Default
         public async Task<Community> GetCommunityById(int id)
         {
             return await _mediator.Send(new GetCommunityByIdQuery { Id = id });
+        }
+
+        [HttpPost("[action]")]
+        public async Task<List<Property>> GetPropertiesUnderCommunity(GetPropertiesUnderCommunityQuery @bject)
+        {
+            return await _mediator.Send(new GetPropertiesUnderCommunityQuery { Id = @bject.Id, DomainKey = @bject.DomainKey });
         }
     }
 }

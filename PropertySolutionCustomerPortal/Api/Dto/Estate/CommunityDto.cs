@@ -21,9 +21,12 @@ namespace PropertySolutionCustomerPortal.Api.Dto.Estate
         public string Location { get; set; }
         public bool IsFeatured { get; set; }
         public bool IsActive { get; set; }
+        public string Status { get; set; }
         public int StatusId { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
+        public string CommunityType { get; set; }
+
         public int CommunityTypeId { get; set; }
         public double LandArea { get; set; }
         public int NumberOfUnits { get; set; }

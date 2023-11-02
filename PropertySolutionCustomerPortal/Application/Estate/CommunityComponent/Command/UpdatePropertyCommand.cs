@@ -4,7 +4,7 @@ using PropertySolutionCustomerPortal.Domain.Entities.Estate;
 
 namespace PropertySolutionCustomerPortal.Application.Estate.PropertyComponent.Command
 {
-    public class UpdateCommunityCommand : IRequest<Community>
+    public class UpdateCommunityCommand : IRequest<bool>
     {
         public CommunityDto Community { get; set; }
     }

@@ -8,7 +8,7 @@ using PropertySolutionCustomerPortal.Domain.Repository.Estate;
 
 namespace PropertySolutionCustomerPortal.Application.Estate.CommunityComponent.Handler
 {
-    public class UpdateCommunityCommandHandler : IRequestHandler<UpdateCommunityCommand, Community>
+    public class UpdateCommunityCommandHandler : IRequestHandler<UpdateCommunityCommand, bool>
     {
         private readonly ICommunityRepository _communityRepository;
         private readonly IMapper _mapper;
@@ -19,13 +19,13 @@ namespace PropertySolutionCustomerPortal.Application.Estate.CommunityComponent.H
             _mapper = mapper;
         }
 
-        public async Task<Community> Handle(UpdateCommunityCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(UpdateCommunityCommand request, CancellationToken cancellationToken)
         {
             try
             {
                 var communityEntity = _mapper.Map<Community>(request.Community);
                 Community community = await _communityRepository.UpdateCommunity(communityEntity);
-                return community;
+                return true;
             }
             catch (Exception ex)
             {

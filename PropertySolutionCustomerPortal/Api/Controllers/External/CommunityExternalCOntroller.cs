@@ -27,7 +27,7 @@ namespace CommunitySolutionCustomerPortal.Api.Controllers.External
         }
 
         [HttpPost("[action]")]
-        public async Task<Community> EditCommunity(UpdateCommunityCommand @object)
+        public async Task<bool> EditCommunity(UpdateCommunityCommand @object)
         {
             return await _mediator.Send(new UpdateCommunityCommand { Community = @object.Community });
         }

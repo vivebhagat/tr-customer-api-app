@@ -14,6 +14,7 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Estate
         Task<List<Community>> GetAllCommunities();
         Task<Community> UpdateCommunity(Community community);
         Task<List<Community>> GetHomeDisplayCommunitites();
+        Task<List<Property>> GetPropertiesUnderCommunity(int Id, string domainKey);
     }
 
     public class CommunityRepository : ICommunityRepository
@@ -111,6 +112,16 @@ namespace PropertySolutionCustomerPortal.Domain.Repository.Estate
         public async Task<Community> GetCommunityById(int Id)
         {
             return await db.Communities.Where(m => m.Id == Id && m.ArchiveDate == null).FirstOrDefaultAsync();
+        }
+
+        public async Task<List<Property>> GetPropertiesUnderCommunity(int Id, string domainKey)
+        {
+            List<int> ids =  await _httpHelper.GetAsync<List<int>>("/api/CommunityToPropertyMapExternal/GetPropertyIdListunderCommunity/" + Id, domainKey);
+
+            List<Property> matchingProperties = await db.Property.Where(m => ids.Contains(m.Id) && m.IsPublished && m.ArchiveDate == null)
+                  .ToListAsync();
+
+            return matchingProperties;
         }
     }
 }
